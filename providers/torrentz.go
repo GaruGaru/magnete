@@ -66,9 +66,8 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 		for _, torrentItem := range torrents {
 			var title = scrape.Text(torrentItem)
 			var itemUrl = scrape.Attr(torrentItem, "href")
-			go t.scrapeItem(title, itemUrl, resultsChannel, &wg)
+			go t.scrapeItem(Partial(title), itemUrl, resultsChannel, &wg)
 		}
-
 
 		wg.Wait()
 		close(resultsChannel)
@@ -83,14 +82,15 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 	return results
 }
 
-func (t Torrentz) scrapeItem(title string, url string, results chan TorrentResult, wg *sync.WaitGroup) {
+func (t Torrentz) scrapeItem(res TorrentResult, url string, results chan TorrentResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var magnets, err = magnetList(fmt.Sprintf("%s%s", t.url, url))
 	if err == nil {
 		for _, m := range magnets {
 			var magnetUrl, err = getMagnent(m)
 			if err == nil {
-				results <- TorrentResult{title, magnetUrl}
+				res.Magnet = magnetUrl
+				results <- res
 				break
 			}
 		}

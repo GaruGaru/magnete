@@ -1,24 +1,31 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/GaruGaru/magnete/providers"
-	"fmt"
-	"flag"
 )
 
 func main() {
 
-	var query = flag.String("query", "", "Search query")
+	var provider = providers.NewTorrentz("https://torrentz2.eu")
 
-	if *query != "" {
-		var torrentz providers.TorrentProvider = providers.NewTorrentz("https://torrentz2.eu")
-		var torrents = torrentz.Get(*query)
+	r := gin.Default()
+	r.GET("/magnete", func(c *gin.Context) {
 
-		for i, torrent := range torrents {
-			fmt.Printf("%d - %s: %s\n", i, torrent.Title, torrent.Url)
+		query := c.Query("q")
+
+		if query == "" {
+			c.JSON(400, gin.H{
+				"message": "error",
+				"reason":  "Missing query param 'q'",
+			})
+			return
 		}
-	}else{
-		panic("Empty query.")
-	}
+
+		var results = provider.Get(query)
+		c.JSON(200, results)
+
+	})
+	r.Run()
 
 }

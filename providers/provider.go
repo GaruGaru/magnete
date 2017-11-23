@@ -1,8 +1,15 @@
 package providers
 
 type TorrentResult struct {
-	Title string
-	Url   string
+	Title  string
+	Magnet string
+	Size   string
+}
+
+func Partial(title string) TorrentResult {
+	var result = TorrentResult{}
+	result.Title = title
+	return result
 }
 
 type TorrentProvider interface {

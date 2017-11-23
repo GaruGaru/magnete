@@ -1,6 +1,6 @@
 
-#Magnete 
+# Magnete 
 
-##Blazing fast torrent magnet link searcher 
+## Blazing fast torrent magnet link searcher 
 
  

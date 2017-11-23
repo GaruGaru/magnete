@@ -1,6 +1,1 @@
 .idea/
-Gopkg.lock
-Gopkg.toml
-main.go
-providers/
-vendor/

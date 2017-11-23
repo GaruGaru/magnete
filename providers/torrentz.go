@@ -63,7 +63,6 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 		resultsChannel := make(chan TorrentResult, 1000)
 		var wg sync.WaitGroup
 		wg.Add(len(torrents))
-		//fmt.Printf("Scraping %d torrents\n", len(torrents))
 		for _, torrentItem := range torrents {
 			var title = scrape.Text(torrentItem)
 			var itemUrl = scrape.Attr(torrentItem, "href")
@@ -86,24 +85,16 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 
 func (t Torrentz) scrapeItem(title string, url string, results chan TorrentResult, wg *sync.WaitGroup) {
 	defer wg.Done()
-	 //fmt.Printf("Done scraping %s\n", title)
-
 	var magnets, err = magnetList(fmt.Sprintf("%s%s", t.url, url))
 	if err == nil {
-		//fmt.Printf("Got %d magnets provider for %s\n", len(magnets), title)
 		for _, m := range magnets {
-			//fmt.Printf("Trying magnet provider %s\n", m)
 			var magnetUrl, err = getMagnent(m)
 			if err == nil {
-				//fmt.Printf("Found magnet from %s\n", m)
 				results <- TorrentResult{title, magnetUrl}
 				break
 			}
 		}
-	} else {
-		//fmt.Printf("No magnets provider for %s\n", title)
 	}
-
 }
 
 func getMagnent(url string) (string, error) {

@@ -66,7 +66,11 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 		for _, torrentItem := range torrents {
 			var title = scrape.Text(torrentItem)
 			var itemUrl = scrape.Attr(torrentItem, "href")
-			go t.scrapeItem(Partial(title), itemUrl, resultsChannel, &wg)
+			var itemSize = scrape.FindAll(torrentItem.Parent.Parent, sizeMatcher)
+
+			fmt.Printf("%d", itemSize)
+
+			go t.scrapeItem(title, itemUrl, resultsChannel, &wg)
 		}
 
 		wg.Wait()
@@ -82,15 +86,18 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 	return results
 }
 
-func (t Torrentz) scrapeItem(res TorrentResult, url string, results chan TorrentResult, wg *sync.WaitGroup) {
+func (t Torrentz) scrapeItem(title string, url string, results chan TorrentResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var magnets, err = magnetList(fmt.Sprintf("%s%s", t.url, url))
 	if err == nil {
 		for _, m := range magnets {
 			var magnetUrl, err = getMagnent(m)
 			if err == nil {
-				res.Magnet = magnetUrl
-				results <- res
+				results <- TorrentResult{
+					Title:  title,
+					Magnet: magnetUrl,
+					Size:   "0 Gb",
+				}
 				break
 			}
 		}
@@ -129,6 +136,10 @@ func magnetUrlMatcher(n *html.Node) bool {
 	} else {
 		return false
 	}
+}
+
+func sizeMatcher(n *html.Node) bool {
+	return n.DataAtom == atom.Span
 }
 
 func magnetListMatcher(n *html.Node) bool {

@@ -12,7 +12,7 @@
 // Socket interface extensions are defined in RFC 3493, RFC 3542 and
 // RFC 3678.
 // MLDv1 and MLDv2 are defined in RFC 2710 and RFC 3810.
-// Source-specific multicast is defined in RFC 4607.
+// source-specific multicast is defined in RFC 4607.
 //
 // On Darwin, this package requires OS X Mavericks version 10.9 or
 // above, or equivalent.
@@ -200,7 +200,7 @@
 //	}
 //
 //
-// Source-specific multicasting
+// source-specific multicasting
 //
 // An application that uses PacketConn on MLDv2 supported platform is
 // able to join source-specific multicast groups.

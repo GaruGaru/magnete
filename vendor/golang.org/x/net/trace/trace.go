@@ -681,7 +681,7 @@ type trace struct {
 	// Family is the top-level grouping of traces to which this belongs.
 	Family string
 
-	// Title is the title of this trace.
+	// title is the title of this trace.
 	Title string
 
 	// Timing information.
@@ -1055,7 +1055,7 @@ const pageHTML = `
 	<tr class="first">
 		<td class="when">{{$tr.When}}</td>
 		<td class="elapsed">{{$tr.ElapsedTime}}</td>
-		<td>{{$tr.Title}}</td>
+		<td>{{$tr.title}}</td>
 		{{/* TODO: include traceID/spanID */}}
 	</tr>
 	{{if $.Expanded}}

@@ -14,7 +14,7 @@
 // for multicast source filters are defined in RFC 1112 and RFC 3678.
 // IGMPv1, IGMPv2 and IGMPv3 are defined in RFC 1112, RFC 2236 and RFC
 // 3376.
-// Source-specific multicast is defined in RFC 4607.
+// source-specific multicast is defined in RFC 4607.
 //
 //
 // Unicasting
@@ -201,7 +201,7 @@
 //	}
 //
 //
-// Source-specific multicasting
+// source-specific multicasting
 //
 // An application that uses PacketConn or RawConn on IGMPv3 supported
 // platform is able to join source-specific multicast groups.

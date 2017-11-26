@@ -68,7 +68,7 @@ func CodecGenTempWrite{{ .RandString }}() {
 	typs = append(typs, reflect.TypeOf(t{{ $index }}))
 {{ end }}
 	{{ if not .CodecPkgFiles }}{{ .CodecPkgName }}.{{ end }}Gen(&out, "{{ .BuildTag }}", "{{ .PackageName }}", "{{ .RandString }}", {{ .NoExtensions }}, {{ if not .CodecPkgFiles }}{{ .CodecPkgName }}.{{ end }}NewTypeInfos(strings.Split("{{ .StructTags }}", ",")), typs...)
-	bout, err := format.Source(out.Bytes())
+	bout, err := format.source(out.Bytes())
 	if err != nil {
 		fout.Write(out.Bytes())
 		panic(err)

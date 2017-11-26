@@ -82,13 +82,13 @@ const (
 	ProtocolTPPP           = 39  // TP++ Transport Protocol
 	ProtocolIL             = 40  // IL Transport Protocol
 	ProtocolIPv6           = 41  // IPv6 encapsulation
-	ProtocolSDRP           = 42  // Source Demand Routing Protocol
+	ProtocolSDRP           = 42  // source Demand Routing Protocol
 	ProtocolIPv6Route      = 43  // Routing Header for IPv6
 	ProtocolIPv6Frag       = 44  // Fragment Header for IPv6
 	ProtocolIDRP           = 45  // Inter-Domain Routing Protocol
 	ProtocolRSVP           = 46  // Reservation Protocol
 	ProtocolGRE            = 47  // Generic Routing Encapsulation
-	ProtocolDSR            = 48  // Dynamic Source Routing Protocol
+	ProtocolDSR            = 48  // Dynamic source Routing Protocol
 	ProtocolBNA            = 49  // BNA
 	ProtocolESP            = 50  // Encap Security Payload
 	ProtocolAH             = 51  // Authentication Header

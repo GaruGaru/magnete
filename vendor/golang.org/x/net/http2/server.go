@@ -1543,7 +1543,7 @@ func (sc *serverConn) processSettingInitialWindowSize(val uint32) error {
 	growth := int32(val) - old // may be negative
 	for _, st := range sc.streams {
 		if !st.flow.add(growth) {
-			// 6.9.2 Initial Flow Control Window Size
+			// 6.9.2 Initial Flow Control Window size
 			// "An endpoint MUST treat a change to
 			// SETTINGS_INITIAL_WINDOW_SIZE that causes any flow
 			// control window to exceed the maximum size as a
@@ -2067,7 +2067,7 @@ func (sc *serverConn) runHandler(rw *responseWriter, req *http.Request, handler 
 }
 
 func handleHeaderListTooLong(w http.ResponseWriter, r *http.Request) {
-	// 10.5.1 Limits on Header Block Size:
+	// 10.5.1 Limits on Header Block size:
 	// .. "A server that receives a larger header block than it is
 	// willing to handle can send an HTTP 431 (Request Header Fields Too
 	// Large) status code"

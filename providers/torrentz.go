@@ -62,15 +62,15 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 
 		resultsChannel := make(chan TorrentResult, 1000)
 		var wg sync.WaitGroup
-		wg.Add(len(torrents))
 		for _, torrentItem := range torrents {
 			var title = scrape.Text(torrentItem)
 			var itemUrl = scrape.Attr(torrentItem, "href")
-			var itemSize = scrape.FindAll(torrentItem.Parent.Parent, sizeMatcher)
-
-			fmt.Printf("%d", itemSize)
-
-			go t.scrapeItem(title, itemUrl, resultsChannel, &wg)
+			var info = scrape.FindAll(torrentItem.Parent.Parent, sizeMatcher)
+			if len(info) == 5 {
+				wg.Add(1)
+				var partial = PartialResult(title, itemUrl, info[2].FirstChild.Data, info[1].FirstChild.Data, info[3].FirstChild.Data, info[4].FirstChild.Data)
+				go t.scrapeItem(partial, resultsChannel, &wg)
+			}
 		}
 
 		wg.Wait()
@@ -86,17 +86,21 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 	return results
 }
 
-func (t Torrentz) scrapeItem(title string, url string, results chan TorrentResult, wg *sync.WaitGroup) {
+func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var magnets, err = magnetList(fmt.Sprintf("%s%s", t.url, url))
+	var magnets, err = magnetList(fmt.Sprintf("%s%s", t.url, item.Source))
 	if err == nil {
 		for _, m := range magnets {
 			var magnetUrl, err = getMagnent(m)
 			if err == nil {
 				results <- TorrentResult{
-					Title:  title,
+					Title:  item.Title,
+					Source: item.Source,
 					Magnet: magnetUrl,
-					Size:   "0 Gb",
+					Size:   item.Size,
+					Peers:  item.Peers,
+					Seeds:  item.Seeds,
+					Age:    item.Age,
 				}
 				break
 			}
@@ -113,7 +117,7 @@ func getMagnent(url string) (string, error) {
 	if len(urls) > 0 {
 		return scrape.Attr(urls[0], "href"), nil
 	} else {
-		return "no_magnet", fmt.Errorf("no magnet found in %s", url)
+		return "no_magnet", fmt.Errorf("no Magnet found in %s", url)
 	}
 }
 
@@ -132,7 +136,7 @@ func magnetList(url string) ([]string, error) {
 
 func magnetUrlMatcher(n *html.Node) bool {
 	if n.DataAtom == atom.A {
-		return strings.HasPrefix(scrape.Attr(n, "href"), "magnet:")
+		return strings.HasPrefix(scrape.Attr(n, "href"), "Magnet:")
 	} else {
 		return false
 	}

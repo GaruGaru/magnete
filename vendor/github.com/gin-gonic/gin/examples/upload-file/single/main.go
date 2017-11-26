@@ -16,7 +16,7 @@ func main() {
 		name := c.PostForm("name")
 		email := c.PostForm("email")
 
-		// Source
+		// source
 		file, _ := c.FormFile("file")
 		src, _ := file.Open()
 		defer src.Close()

@@ -73,7 +73,7 @@ if {{var "l"}} == 0 {
 	var {{var "rl"}} int; _ =  {{var "rl"}}
 	{{if isSlice }} if {{var "hl"}} {
 	if {{var "l"}} > cap({{var "v"}}) {
-		{{var "rl"}} = z.DecInferLen({{var "l"}}, z.DecBasicHandle().MaxInitLen, {{ .Size }})
+		{{var "rl"}} = z.DecInferLen({{var "l"}}, z.DecBasicHandle().MaxInitLen, {{ .size }})
 		if {{var "rl"}} <= cap({{var "v"}}) {
 			{{var "v"}} = {{var "v"}}[:{{var "rl"}}]
 		} else {
@@ -90,7 +90,7 @@ if {{var "l"}} == 0 {
 	for ; ({{var "hl"}} && {{var "j"}} < {{var "l"}}) || !({{var "hl"}} || r.CheckBreak()); {{var "j"}}++ {
 		{{if not isArray}} if {{var "j"}} == 0 && len({{var "v"}}) == 0 {
 			if {{var "hl"}} {
-				{{var "rl"}} = z.DecInferLen({{var "l"}}, z.DecBasicHandle().MaxInitLen, {{ .Size }})
+				{{var "rl"}} = z.DecInferLen({{var "l"}}, z.DecBasicHandle().MaxInitLen, {{ .size }})
 			} else {
 				{{var "rl"}} = 8
 			}

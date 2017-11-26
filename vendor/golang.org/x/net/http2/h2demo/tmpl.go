@@ -787,7 +787,7 @@ syntax of package template.  The default output is equivalent to -f
     ConflictDir   string // this directory shadows Dir in $GOPATH
     BinaryOnly    bool   // binary-only package: cannot be recompiled from sources
 
-    // Source files
+    // source files
     GoFiles        []string // .go source files (excluding CgoFiles, TestGoFiles, XTestGoFiles)
     CgoFiles       []string // .go sources files that import &#34;C&#34;
     IgnoredGoFiles []string // .go sources ignored due to build constraints

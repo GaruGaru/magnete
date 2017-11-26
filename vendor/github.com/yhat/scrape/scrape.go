@@ -103,7 +103,7 @@ func Attr(node *html.Node, key string) string {
 //     if err != nil {
 //         // handle error
 //     }
-//     title, ok := scrape.Find(root, scrape.ByTag(atom.Title))
+//     title, ok := scrape.Find(root, scrape.ByTag(atom.title))
 func ByTag(a atom.Atom) Matcher {
 	return func(node *html.Node) bool { return node.DataAtom == a }
 }

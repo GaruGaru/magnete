@@ -62,7 +62,7 @@ func validateStruct() {
 
 	if errs != nil {
 
-		fmt.Println(errs) // output: Key: "User.Age" Error:Field validation for "Age" failed on the "lte" tag
+		fmt.Println(errs) // output: Key: "User.age" Error:Field validation for "age" failed on the "lte" tag
 		//	                         Key: "User.Addresses[0].City" Error:Field validation for "City" failed on the "required" tag
 		err := errs.(validator.ValidationErrors)["User.Addresses[0].City"]
 		fmt.Println(err.Field) // output: City

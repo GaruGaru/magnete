@@ -388,9 +388,9 @@ func testValues(t *testing.T, k registry.Key) {
 				testGetStringValue(t, k, test)
 				_, gottype, err := k.GetIntegerValue(test.Name)
 				testErrUnexpectedType(t, test, gottype, err)
-				// Size of utf16 string in bytes is not perfect,
+				// size of utf16 string in bytes is not perfect,
 				// but correct for current test values.
-				// Size also includes terminating 0.
+				// size also includes terminating 0.
 				testGetValue(t, k, test, (len(test.Value.(string))+1)*2)
 			}
 			_, _, err := k.GetStringValue(test.Name + "_string_not_created")

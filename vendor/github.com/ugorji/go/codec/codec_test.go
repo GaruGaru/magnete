@@ -859,7 +859,7 @@ func testCodecMiscOne(t *testing.T, h Handle) {
 	ts := newTestStrucFlex(testDepth, testNumRepeatString, false, !testSkipIntf, false)
 	b = testMarshalErr(ts, h, t, "pointer-to-struct")
 	if len(b) < 40 {
-		logT(t, "------- Size must be > 40. Size: %d", len(b))
+		logT(t, "------- size must be > 40. size: %d", len(b))
 		failT(t)
 	}
 	var b1 = b
@@ -1567,7 +1567,7 @@ func doTestPythonGenStreams(t *testing.T, name string, h Handle) {
 		if err = deepEqual(v, v1); err == nil {
 			logT(t, "++++++++ Objects match: %T, %v", v, v)
 		} else {
-			logT(t, "-------- FAIL: Objects do not match: %v. Source: %T. Decoded: %T", err, v, v1)
+			logT(t, "-------- FAIL: Objects do not match: %v. source: %T. Decoded: %T", err, v, v1)
 			logT(t, "--------   GOLDEN: %#v", v)
 			// logT(t, "--------   DECODED: %#v <====> %#v", v1, reflect.Indirect(reflect.ValueOf(v1)).Interface())
 			logT(t, "--------   DECODED: %#v <====> %#v", v1, reflect.Indirect(reflect.ValueOf(v1)).Interface())

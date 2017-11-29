@@ -4,7 +4,7 @@ MAINTAINER Tommaso Garuglieri <garuglieritommaso@gmail.com>
 
 RUN apk update &&  apk add ca-certificates && update-ca-certificates && apk add --update openssl
 
-RUN apk add git
+RUN apk add git && apk add curl
 
 RUN wget https://github.com/golang/dep/releases/download/v0.3.1/dep-linux-amd64 -O /usr/local/bin/dep && chmod +x /usr/local/bin/dep
 
@@ -20,6 +20,6 @@ RUN dep ensure
 
 RUN go build *.go
 
-# HEALTHCHECK --interval=1s --timeout=3s CMD curl -f http://localhost/probe
+HEALTHCHECK --interval=1s --timeout=3s CMD curl --fail http://localhost/probe || exit 1
 
 CMD ["/gopath/src/github.com/GaruGaru/magnete/main"]

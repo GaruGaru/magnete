@@ -3,11 +3,16 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/GaruGaru/magnete/providers"
+	"os"
+	"time"
+	"fmt"
 )
 
 func main() {
 
-	var provider = providers.NewTorrentz("https://torrentz2.eu")
+	var timeoutDuration = getTimeoutEnv()
+
+	var provider = providers.NewTorrentz("https://torrentz2.eu", timeoutDuration)
 
 	r := gin.Default()
 
@@ -33,4 +38,17 @@ func main() {
 	})
 	r.Run()
 
+}
+func getTimeoutEnv() time.Duration {
+	var timeout = os.Getenv("TIMEOUT")
+	if timeout != "" {
+		var envTimeout, err = time.ParseDuration(timeout)
+		if err == nil {
+			fmt.Printf("Got timeout duration %s", envTimeout)
+			return envTimeout
+		} else {
+			panic(err)
+		}
+	}
+	return 3 * time.Second
 }

@@ -15,11 +15,12 @@ import (
 )
 
 type Torrentz struct {
-	url string
+	url     string
+	timeout time.Duration
 }
 
-func NewTorrentz(url string) Torrentz {
-	return Torrentz{url}
+func NewTorrentz(url string, timeout time.Duration) Torrentz {
+	return Torrentz{url, timeout}
 }
 
 func (t Torrentz) Get(query string) []TorrentResult {
@@ -27,17 +28,17 @@ func (t Torrentz) Get(query string) []TorrentResult {
 	return t.torrentList(searchUrl, torrentListMatcher)
 }
 
-func getRoot(url string) (*html.Node, error) {
+func (t Torrentz) getRoot(url string) (*html.Node, error) {
 
 	var transport = &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout: 10 * time.Second,
+			Timeout: time.Second,
 		}).Dial,
-		TLSHandshakeTimeout: 10 * time.Second,
+		TLSHandshakeTimeout: time.Second,
 	}
 
 	var httpClient = &http.Client{
-		Timeout:   time.Second * 10,
+		Timeout:   t.timeout,
 		Transport: transport,
 	}
 
@@ -62,7 +63,7 @@ func getRoot(url string) (*html.Node, error) {
 }
 
 func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResult {
-	var root, err = getRoot(url)
+	var root, err = t.getRoot(url)
 	var results []TorrentResult
 	if err == nil {
 
@@ -96,30 +97,47 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 
 func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var magnets, err = magnetList(fmt.Sprintf("%s%s", t.url, item.Source))
+	var magnets, err = t.magnetList(fmt.Sprintf("%s%s", t.url, item.Source))
+
+	var magnetWg sync.WaitGroup
+	magnetChannel := make(chan TorrentResult, len(magnets))
+
 	if err == nil {
 		for _, m := range magnets {
-			var magnetUrl, err = getMagnent(m)
-			if err == nil {
-				results <- TorrentResult{
-					Title:  item.Title,
-					Source: item.Source,
-					Magnet: magnetUrl,
-					Size:   item.Size,
-					Peers:  item.Peers,
-					Seeds:  item.Seeds,
-					Age:    item.Age,
+			magnetWg.Add(1)
+			go func() {
+				defer magnetWg.Done()
+				var magnetUrl, err = t.getMagnent(m)
+				if err == nil {
+					magnetChannel <- TorrentResult{
+						Title:  item.Title,
+						Source: item.Source,
+						Magnet: magnetUrl,
+						Size:   item.Size,
+						Peers:  item.Peers,
+						Seeds:  item.Seeds,
+						Age:    item.Age,
+					}
 				}
-				break
-			}
+			}()
 		}
-	} else {
-		fmt.Printf("Error scraping url %s: %s", item.Source, err)
+
+		magnetWg.Wait()
+		close(magnetChannel)
+
+		if len(magnetChannel) != 0 {
+			var last TorrentResult
+			for result := range magnetChannel {
+				last = result
+			}
+			results <- last
+		}
+
 	}
 }
 
-func getMagnent(url string) (string, error) {
-	var root, err = getRoot(url)
+func (t Torrentz) getMagnent(url string) (string, error) {
+	var root, err = t.getRoot(url)
 	if err != nil {
 		return "", err
 	}
@@ -131,8 +149,8 @@ func getMagnent(url string) (string, error) {
 	}
 }
 
-func magnetList(url string) ([]string, error) {
-	var root, err = getRoot(url)
+func (t Torrentz) magnetList(url string) ([]string, error) {
+	var root, err = t.getRoot(url)
 	if err != nil {
 		return nil, err
 	}

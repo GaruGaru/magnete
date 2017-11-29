@@ -1,10 +1,10 @@
 version: "3"
 services:
 
-  portfolio:
+  backend:
       image: garugaru/magnete
       ports:
-        - 80:9999
+        - 9999:80
       deploy:
         replicas: 2
         update_config:

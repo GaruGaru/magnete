@@ -10,6 +10,11 @@ func main() {
 	var provider = providers.NewTorrentz("https://torrentz2.eu")
 
 	r := gin.Default()
+
+	r.GET("/probe", func(context *gin.Context) {
+		context.String(200, "OK")
+	})
+
 	r.GET("/magnete", func(c *gin.Context) {
 
 		query := c.Query("q")

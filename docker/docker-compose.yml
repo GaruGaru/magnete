@@ -1,0 +1,7 @@
+version: "3"
+services:
+  magnete:
+      image: garugaru/magnete
+      build: ../
+      ports:
+        - 80:80

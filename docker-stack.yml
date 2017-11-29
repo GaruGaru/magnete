@@ -1,0 +1,14 @@
+version: "3"
+services:
+
+  portfolio:
+      image: garugaru/magnete
+      ports:
+        - 80:9999
+      deploy:
+        replicas: 2
+        update_config:
+          parallelism: 1
+          delay: 5s
+        restart_policy:
+          condition: on-failure

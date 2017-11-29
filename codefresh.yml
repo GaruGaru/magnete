@@ -1,0 +1,27 @@
+version: '1.0'
+steps:
+  build_image:
+    type: build
+    description: Image build
+    image_name: garugaru/magnete
+    tag: ${{CF_SHORT_REVISION}}
+
+  push_image:
+    type: push
+    title: Image push
+    candidate: ${{build_image}}
+    tag: ${{CF_SHORT_REVISION}}
+    fail_fast: false
+
+  deploy_to_swarm:
+    image: codefresh/remote-docker:latest
+    working_directory: ${{main_clone}}
+    commands:
+      - rdocker ${{RDOCKER_HOST}} docker stack deploy --compose-file docker-stack.yml ${{STACK_NAME}}
+      - rdocker ${{RDOCKER_HOST}} docker service update --force --image garugaru/magnete:${{CF_SHORT_REVISION}} ${{STACK_NAME}}_magnete
+    environment:
+      - SSH_KEY=${{SSH_KEY}}
+    when:
+      branch:
+        only:
+          - master

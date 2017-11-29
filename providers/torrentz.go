@@ -79,6 +79,8 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 				wg.Add(1)
 				var partial = PartialResult(title, itemUrl, info[2].FirstChild.Data, info[1].FirstChild.Data, info[3].FirstChild.Data, info[4].FirstChild.Data)
 				go t.scrapeItem(partial, resultsChannel, &wg)
+			} else {
+				fmt.Printf("No info for %s: %s\n", itemUrl, err)
 			}
 		}
 
@@ -118,6 +120,8 @@ func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg 
 						Seeds:  item.Seeds,
 						Age:    item.Age,
 					}
+				} else {
+					fmt.Printf("Error on magnet provider %s for %s: %s\n", m, item.Title, err)
 				}
 			}()
 		}
@@ -130,9 +134,14 @@ func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg 
 			for result := range magnetChannel {
 				last = result
 			}
+			fmt.Printf("[OK] Got magnet for %s\n", item.Title)
 			results <- last
+		} else {
+			fmt.Printf("No magnet found for %s\n", item.Title)
 		}
 
+	} else {
+		fmt.Printf("Can't get magnet provider list for %s: %s\n", item.Source, err)
 	}
 }
 
@@ -145,7 +154,7 @@ func (t Torrentz) getMagnent(url string) (string, error) {
 	if len(urls) > 0 {
 		return scrape.Attr(urls[0], "href"), nil
 	} else {
-		return "no_magnet", fmt.Errorf("no Magnet found in %s", url)
+		return "no_magnet", fmt.Errorf("no Magnet found in %s: %s", url, err)
 	}
 }
 

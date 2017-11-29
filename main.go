@@ -44,7 +44,7 @@ func getTimeoutEnv() time.Duration {
 	if timeout != "" {
 		var envTimeout, err = time.ParseDuration(timeout)
 		if err == nil {
-			fmt.Printf("Got timeout duration %s", envTimeout)
+			fmt.Printf("Got timeout duration %s\n", envTimeout)
 			return envTimeout
 		} else {
 			panic(err)

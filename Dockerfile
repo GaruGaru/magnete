@@ -20,6 +20,6 @@ RUN dep ensure
 
 RUN go build *.go
 
-HEALTHCHECK --interval=1s --timeout=3s CMD curl --fail http://localhost/probe || exit 1
+HEALTHCHECK --interval=5s --timeout=5s CMD curl --fail http://localhost/probe || exit 1
 
 CMD ["/gopath/src/github.com/GaruGaru/magnete/main"]

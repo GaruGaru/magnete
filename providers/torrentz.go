@@ -33,6 +33,7 @@ func (t Torrentz) getRoot(url string) (*html.Node, error) {
 	var transport = &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: t.timeout,
+			KeepAlive: t.timeout,
 		}).Dial,
 		TLSHandshakeTimeout: t.timeout,
 	}

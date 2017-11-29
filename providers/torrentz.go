@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 	"net"
+	"log"
 )
 
 type Torrentz struct {
@@ -30,17 +31,24 @@ func getRoot(url string) (*html.Node, error) {
 
 	var transport = &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout: 5 * time.Second,
+			Timeout: 10 * time.Second,
 		}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second,
+		TLSHandshakeTimeout: 10 * time.Second,
 	}
 
 	var httpClient = &http.Client{
-		Timeout:   time.Second * 5,
+		Timeout:   time.Second * 10,
 		Transport: transport,
 	}
 
-	resp, err := httpClient.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36")
+
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -105,6 +113,8 @@ func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg 
 				break
 			}
 		}
+	} else {
+		fmt.Printf("Error scraping url %s: %s", item.Source, err)
 	}
 }
 
@@ -136,7 +146,7 @@ func magnetList(url string) ([]string, error) {
 
 func magnetUrlMatcher(n *html.Node) bool {
 	if n.DataAtom == atom.A {
-		return strings.HasPrefix(scrape.Attr(n, "href"), "Magnet:")
+		return strings.HasPrefix(scrape.Attr(n, "href"), "magnet:")
 	} else {
 		return false
 	}

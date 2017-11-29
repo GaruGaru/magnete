@@ -1,7 +1,7 @@
 version: "3"
 services:
 
-  backend:
+  magnete:
       image: garugaru/magnete
       ports:
         - 9999:80

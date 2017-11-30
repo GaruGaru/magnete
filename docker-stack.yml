@@ -7,7 +7,7 @@ services:
         - 9999:80
       environment:
         - GIN_MODE=release
-        - TIMEOUT=5s
+        - TIMEOUT=60s
       deploy:
         replicas: 2
         update_config:

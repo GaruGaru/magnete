@@ -24,26 +24,22 @@ func NewTorrentz(url string, timeout time.Duration) Torrentz {
 }
 
 func (t Torrentz) Get(query string) []TorrentResult {
-	var searchUrl = fmt.Sprintf("%s/search?f=%s", t.url, url.QueryEscape(query))
-	return t.torrentList(searchUrl, torrentListMatcher)
-}
-
-func (t Torrentz) getRoot(url string) (*html.Node, error) {
 
 	var transport = &http.Transport{
-		Dial: (&net.Dialer{
-			Timeout: t.timeout,
-		}).Dial,
+		Dial:                (&net.Dialer{Timeout: t.timeout,}).Dial,
 		MaxIdleConnsPerHost: 50,
 		MaxIdleConns:        50,
 		DisableKeepAlives:   true,
 		TLSHandshakeTimeout: t.timeout,
 	}
 
-	var httpClient = &http.Client{
-		Timeout:   t.timeout,
-		Transport: transport,
-	}
+	var httpClient = &http.Client{Timeout: t.timeout, Transport: transport,}
+
+	var searchUrl = fmt.Sprintf("%s/search?f=%s", t.url, url.QueryEscape(query))
+	return t.torrentList(*httpClient, searchUrl, torrentListMatcher)
+}
+
+func (t Torrentz) getRoot(httpClient http.Client, url string) (*html.Node, error) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Close = true
@@ -69,8 +65,8 @@ func (t Torrentz) getRoot(url string) (*html.Node, error) {
 	return root, nil
 }
 
-func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResult {
-	var root, err = t.getRoot(url)
+func (t Torrentz) torrentList(httpClient http.Client, url string, matcher scrape.Matcher) []TorrentResult {
+	var root, err = t.getRoot(httpClient, url)
 	var results []TorrentResult
 	if err == nil {
 
@@ -85,7 +81,7 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 			if len(info) == 5 {
 				wg.Add(1)
 				var partial = PartialResult(title, itemUrl, info[2].FirstChild.Data, info[1].FirstChild.Data, info[3].FirstChild.Data, info[4].FirstChild.Data)
-				go t.scrapeItem(partial, resultsChannel, &wg)
+				go t.scrapeItem(httpClient, partial, resultsChannel, &wg)
 			} else {
 				fmt.Printf("No info for %s: %s\n", itemUrl, err)
 			}
@@ -99,14 +95,15 @@ func (t Torrentz) torrentList(url string, matcher scrape.Matcher) []TorrentResul
 		}
 
 	} else {
-		panic(fmt.Sprintf("Unable to fetch results list for %s", url))
+		panic(fmt.Sprintf("Unable to fetch results list for %s: %s", url, err))
 	}
 	return results
 }
 
-func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg *sync.WaitGroup) {
+func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results chan TorrentResult, wg *sync.WaitGroup) {
+
 	defer wg.Done()
-	var magnets, err = t.magnetList(fmt.Sprintf("%s%s", t.url, item.Source))
+	var magnets, err = t.magnetList(httpClient, fmt.Sprintf("%s%s", t.url, item.Source))
 
 	var magnetWg sync.WaitGroup
 	magnetChannel := make(chan TorrentResult, len(magnets))
@@ -116,7 +113,7 @@ func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg 
 			magnetWg.Add(1)
 			go func() {
 				defer magnetWg.Done()
-				var magnetUrl, err = t.getMagnent(m)
+				var magnetUrl, err = t.getMagnent(httpClient, m)
 				if err == nil {
 					magnetChannel <- TorrentResult{
 						Title:  item.Title,
@@ -152,8 +149,8 @@ func (t Torrentz) scrapeItem(item TorrentResult, results chan TorrentResult, wg 
 	}
 }
 
-func (t Torrentz) getMagnent(url string) (string, error) {
-	var root, err = t.getRoot(url)
+func (t Torrentz) getMagnent(httpClient http.Client, url string) (string, error) {
+	var root, err = t.getRoot(httpClient, url)
 	if err != nil {
 		return "", err
 	}
@@ -165,8 +162,8 @@ func (t Torrentz) getMagnent(url string) (string, error) {
 	}
 }
 
-func (t Torrentz) magnetList(url string) ([]string, error) {
-	var root, err = t.getRoot(url)
+func (t Torrentz) magnetList(httpClient http.Client, url string) ([]string, error) {
+	var root, err = t.getRoot(httpClient, url)
 	if err != nil {
 		return nil, err
 	}

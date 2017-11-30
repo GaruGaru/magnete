@@ -30,12 +30,13 @@ func (t Torrentz) Get(query string) []TorrentResult {
 
 func (t Torrentz) getRoot(url string) (*html.Node, error) {
 
-	time.Sleep(100 * time.Millisecond)
 	var transport = &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: t.timeout,
-			KeepAlive: t.timeout,
 		}).Dial,
+		MaxIdleConnsPerHost: 50,
+		MaxIdleConns:        50,
+		DisableKeepAlives:   true,
 		TLSHandshakeTimeout: t.timeout,
 	}
 
@@ -45,11 +46,12 @@ func (t Torrentz) getRoot(url string) (*html.Node, error) {
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
+	req.Close = true
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	req.Close = true
+	// req.Close = true
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36")
 
 	resp, err := httpClient.Do(req)

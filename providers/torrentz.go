@@ -1,7 +1,6 @@
 package providers
 
 import (
-	"github.com/valyala/fasthttp"
 	"github.com/yhat/scrape"
 	"net/http"
 	"golang.org/x/net/html/atom"

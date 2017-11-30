@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/valyala/fasthttp"
 	"github.com/yhat/scrape"
 	"net/http"
 	"golang.org/x/net/html/atom"
@@ -30,6 +31,7 @@ func (t Torrentz) Get(query string) []TorrentResult {
 
 func (t Torrentz) getRoot(url string) (*html.Node, error) {
 
+	time.Sleep(100 * time.Millisecond)
 	var transport = &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout: t.timeout,

@@ -107,12 +107,13 @@ func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results
 	magnetChannel := make(chan TorrentResult, len(magnets))
 
 	if err == nil {
-		for _, m := range magnets {
-			if !isBlacklisted(m) {
+		for _, provider := range magnets {
+			if !isBlacklisted(provider) {
+				fmt.Printf("Got provider %s for %s", provider, item.Title)
 				magnetWg.Add(1)
 				go func() {
 					defer magnetWg.Done()
-					var magnetUrl, err = t.getMagnent(httpClient, m)
+					var magnetUrl, err = t.getMagnent(httpClient, provider)
 					if err == nil {
 						magnetChannel <- TorrentResult{
 							Title:  item.Title,
@@ -124,11 +125,11 @@ func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results
 							Age:    item.Age,
 						}
 					} else {
-						fmt.Printf("Error on magnet provider %s for %s: %s\n", m, item.Title, err)
+						fmt.Printf("Error on magnet provider %s for %s: %s\n", provider, item.Title, err)
 					}
 				}()
 			} else {
-				fmt.Printf("Provider %s for %s: is blacklisted\n", m, item.Title)
+				fmt.Printf("Provider %s for %s: is blacklisted\n", provider, item.Title)
 			}
 		}
 

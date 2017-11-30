@@ -95,7 +95,7 @@ func (t Torrentz) torrentList(httpClient http.Client, url string, matcher scrape
 }
 
 func isBlacklisted(provider string) bool { // TODO Implement blacklist
-	return strings.HasPrefix("https://btdb.to/", provider)
+	return strings.HasPrefix(provider, "https://btdb.to/")
 }
 
 func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results chan TorrentResult, wg *sync.WaitGroup) {
@@ -127,7 +127,7 @@ func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results
 						fmt.Printf("Error on magnet provider %s for %s: %s\n", m, item.Title, err)
 					}
 				}()
-			}else{
+			} else {
 				fmt.Printf("Provider %s for %s: is blacklisted\n", m, item.Title)
 			}
 		}

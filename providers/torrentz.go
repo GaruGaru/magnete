@@ -95,7 +95,7 @@ func (t Torrentz) torrentList(httpClient http.Client, url string, matcher scrape
 }
 
 func isBlacklisted(provider string) bool { // TODO Implement blacklist
-	return strings.HasPrefix(provider, "https://btdb.to/")
+	return strings.Contains(provider, "btdb.to")
 }
 
 func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results chan TorrentResult, wg *sync.WaitGroup) {

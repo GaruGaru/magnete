@@ -25,17 +25,12 @@ func NewTorrentz(url string, timeout time.Duration) Torrentz {
 
 func (t Torrentz) Get(query string) []TorrentResult {
 
-	var transport = &http.Transport{
-		Dial:                (&net.Dialer{Timeout: t.timeout,}).Dial,
-		MaxIdleConnsPerHost: 50,
-		MaxIdleConns:        50,
-		DisableKeepAlives:   true,
-		TLSHandshakeTimeout: t.timeout,
-	}
+	var transport = &http.Transport{TLSHandshakeTimeout: t.timeout,}
 
 	var httpClient = &http.Client{Timeout: t.timeout, Transport: transport,}
 
 	var searchUrl = fmt.Sprintf("%s/search?f=%s", t.url, url.QueryEscape(query))
+
 	return t.torrentList(*httpClient, searchUrl, torrentListMatcher)
 }
 

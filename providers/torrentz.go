@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"sync"
 	"time"
-	"net"
 	"log"
 )
 

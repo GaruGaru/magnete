@@ -66,7 +66,6 @@ func (t Torrentz) torrentList(httpClient http.Client, url string, matcher scrape
 	if err == nil {
 
 		torrents := scrape.FindAll(root, matcher)
-
 		resultsChannel := make(chan TorrentResult, 1000)
 		var wg sync.WaitGroup
 		for _, torrentItem := range torrents {
@@ -78,7 +77,7 @@ func (t Torrentz) torrentList(httpClient http.Client, url string, matcher scrape
 				var partial = PartialResult(title, itemUrl, info[2].FirstChild.Data, info[1].FirstChild.Data, info[3].FirstChild.Data, info[4].FirstChild.Data)
 				go t.scrapeItem(httpClient, partial, resultsChannel, &wg)
 			} else {
-				fmt.Printf("No info for %s: %s\n", itemUrl, err)
+				fmt.Printf("No info for %s\n", itemUrl)
 			}
 		}
 
@@ -95,6 +94,10 @@ func (t Torrentz) torrentList(httpClient http.Client, url string, matcher scrape
 	return results
 }
 
+func isBlacklisted(provider string) bool { // TODO Implement blacklist
+	return strings.HasPrefix("https://btdb.to/", provider)
+}
+
 func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results chan TorrentResult, wg *sync.WaitGroup) {
 
 	defer wg.Done()
@@ -105,24 +108,28 @@ func (t Torrentz) scrapeItem(httpClient http.Client, item TorrentResult, results
 
 	if err == nil {
 		for _, m := range magnets {
-			magnetWg.Add(1)
-			go func() {
-				defer magnetWg.Done()
-				var magnetUrl, err = t.getMagnent(httpClient, m)
-				if err == nil {
-					magnetChannel <- TorrentResult{
-						Title:  item.Title,
-						Source: item.Source,
-						Magnet: magnetUrl,
-						Size:   item.Size,
-						Peers:  item.Peers,
-						Seeds:  item.Seeds,
-						Age:    item.Age,
+			if !isBlacklisted(m) {
+				magnetWg.Add(1)
+				go func() {
+					defer magnetWg.Done()
+					var magnetUrl, err = t.getMagnent(httpClient, m)
+					if err == nil {
+						magnetChannel <- TorrentResult{
+							Title:  item.Title,
+							Source: item.Source,
+							Magnet: magnetUrl,
+							Size:   item.Size,
+							Peers:  item.Peers,
+							Seeds:  item.Seeds,
+							Age:    item.Age,
+						}
+					} else {
+						fmt.Printf("Error on magnet provider %s for %s: %s\n", m, item.Title, err)
 					}
-				} else {
-					fmt.Printf("Error on magnet provider %s for %s: %s\n", m, item.Title, err)
-				}
-			}()
+				}()
+			}else{
+				fmt.Printf("Provider %s for %s: is blacklisted\n", m, item.Title)
+			}
 		}
 
 		magnetWg.Wait()

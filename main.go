@@ -50,5 +50,5 @@ func getTimeoutEnv() time.Duration {
 			panic(err)
 		}
 	}
-	return 5 * time.Second
+	return 60 * time.Second
 }

@@ -7,7 +7,6 @@ services:
         - 9999:80
       environment:
         - GIN_MODE=release
-        - GOMAXPROCS=4
       deploy:
         replicas: 1
         update_config:

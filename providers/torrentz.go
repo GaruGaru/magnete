@@ -91,6 +91,7 @@ func (t Torrentz) torrentList(httpClient http.Client, url string, matcher scrape
 	} else {
 		panic(fmt.Sprintf("Unable to fetch results list for %s: %s", url, err))
 	}
+
 	return results
 }
 

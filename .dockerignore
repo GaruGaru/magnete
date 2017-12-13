@@ -1,7 +1,6 @@
 main
 .idea/
 *iml
-docker/
 Dockerfile
 README.md
 vendor/

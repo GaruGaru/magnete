@@ -20,6 +20,10 @@ RUN dep ensure
 
 RUN go build *.go
 
-HEALTHCHECK --interval=5s --timeout=5s CMD curl --fail http://localhost/probe || exit 1
+#RUN go test
 
-CMD ["/gopath/src/github.com/GaruGaru/magnete/main"]
+FROM alpine:latest
+
+COPY --from=0 /gopath/src/github.com/GaruGaru/magnete/main .
+HEALTHCHECK --interval=5s --timeout=5s CMD curl --fail http://localhost/probe || exit 1
+CMD [ "./main" ]

@@ -23,6 +23,6 @@ RUN go build *.go
 #RUN go test
 
 FROM alpine:latest
-
+ADD docker/cert/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=0 /gopath/src/github.com/GaruGaru/magnete/main .
 CMD [ "./main" ]

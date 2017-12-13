@@ -5,7 +5,9 @@ services:
       image: garugaru/magnete
       ports:
         - 9999:80
-
+      environment:
+        - GIN_MODE=release
+        - PORT=80
       deploy:
         replicas: 1
         update_config:

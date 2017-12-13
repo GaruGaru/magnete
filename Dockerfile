@@ -20,7 +20,7 @@ RUN dep ensure
 RUN go build *.go
 
 #RUN go test
-
+RUN apk update && apk add ca-certificates &&  update-ca-certificates && apk add --update openssl
 FROM alpine:latest
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt ./docker/cert/ca-certificates.crt
 COPY --from=0 /gopath/src/github.com/GaruGaru/magnete/main .

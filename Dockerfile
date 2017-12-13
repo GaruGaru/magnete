@@ -15,7 +15,6 @@ ENV GOPATH /gopath
 ENV PATH $PATH:/usr/local/go/bin:$GOPATH/bin
 
 COPY . ./
-ADD docker/cert/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 RUN dep ensure
 RUN go build *.go

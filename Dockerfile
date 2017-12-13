@@ -25,5 +25,4 @@ RUN go build *.go
 FROM alpine:latest
 
 COPY --from=0 /gopath/src/github.com/GaruGaru/magnete/main .
-HEALTHCHECK --interval=5s --timeout=5s CMD curl --fail http://localhost/probe || exit 1
 CMD [ "./main" ]

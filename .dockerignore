@@ -1,6 +1,5 @@
 main
 .idea/
-*iml
 Dockerfile
 README.md
 vendor/
